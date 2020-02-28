@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace H2D_2048
 {
-    public partial class Form1 : Form
+    public partial class frmAbout : Form
     {
-        public Form1()
+        public frmAbout()
         {
             InitializeComponent();
         }

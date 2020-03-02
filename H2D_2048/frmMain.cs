@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using System.Windows.Forms;
 
 namespace H2D_2048
@@ -16,23 +12,46 @@ namespace H2D_2048
         private Label[,] matrixBoard = new Label[4, 4];
         private Block block = new Block();
         private Random rand = new Random();
+        private int Score;
+        private bool GameOver = false;
+        private string directory = @"C:\ProgramData\H2D_2048\";
+        private string file = "Hiscore.txt";
+        private string fullPath = "";
 
         public frmMain()
         {
             InitializeComponent();
+            fullPath = directory + file;
         }
 
         private void frmMain_Load(object sender, EventArgs e)
         {
             try
             {
-                PrintBoard(pnGame);
-                RandomBlock();
-                RandomBlock();
+                NewGame();
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void NewGame()
+        {
+            LoadHiscore();
+            Score = 0;
+            lbScore.Text = Score.ToString();
+            PrintBoard(pnGame);
+            RandomBlock();
+            RandomBlock();
+        }
+
+        private void LoadHiscore()
+        {
+            if (File.Exists(fullPath))
+            {
+                string oldHiscore = File.ReadAllText(fullPath);
+                lbHiscore.Text = oldHiscore;
             }
         }
 
@@ -85,6 +104,7 @@ namespace H2D_2048
                         }
                     }
                 }
+                lbScore.Text = Score.ToString();
             }
             catch (Exception ex)
             {
@@ -115,6 +135,7 @@ namespace H2D_2048
                     set = lstBlank[rand.Next(0, lstBlank.Count - 1)];
                 }
                 matrixNumber[set / 4, set % 4] = rand.Next(1, 100) > 85 ? 4 : 2;
+                Score += matrixNumber[set / 4, set % 4];
             }
         }
 
@@ -136,24 +157,65 @@ namespace H2D_2048
 
         private void frmMain_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Up)
+            try
             {
-                ActionUp();
+                if (GameOver)
+                {
+                    return;
+                }
+                if (e.KeyCode == Keys.Up)
+                {
+                    ActionUp();
+                }
+                if (e.KeyCode == Keys.Down)
+                {
+                    ActionDown();
+                }
+                if (e.KeyCode == Keys.Right)
+                {
+                    ActionRight();
+                }
+                if (e.KeyCode == Keys.Left)
+                {
+                    ActionLeft();
+                }
+                RandomBlock();
+                Refresh();
+                if (CheckGameOver())
+                {
+                    GameOver = true;
+                    MessageBox.Show("GameOver", "2048", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    SaveHiscore(Score);
+                    Score = 0;
+                    lbScore.Text = Score.ToString();
+                    LoadHiscore();
+                }
             }
-            if (e.KeyCode == Keys.Down)
+            catch (Exception ex)
             {
-                ActionDown();
+                MessageBox.Show(ex.Message);
             }
-            if (e.KeyCode == Keys.Right)
+        }
+
+        private void SaveHiscore(int score)
+        {
+            int hiscore = 0;
+            if (!Directory.Exists(directory))
             {
-                ActionRight();
+                Directory.CreateDirectory(directory);
             }
-            if (e.KeyCode == Keys.Left)
+            if (File.Exists(fullPath))
             {
-                ActionLeft();
+                string oldHiscore = File.ReadAllText(fullPath);
+                if (!string.IsNullOrWhiteSpace(oldHiscore))
+                    hiscore = int.Parse(oldHiscore);
+                File.Delete(fullPath);
             }
-            RandomBlock();
-            Refresh();
+            if (score > hiscore)
+            {
+                hiscore = score;
+            }
+            File.WriteAllText(fullPath, hiscore.ToString());
         }
 
         private void ActionRight()
@@ -264,6 +326,48 @@ namespace H2D_2048
                     }
                 }
             }
+        }
+
+        private bool CheckGameOver()
+        {
+            for (int x = 0; x < 4; x++)
+            {
+                for (int y = 0; y < 4; y++)
+                {
+                    if (matrixNumber[x, y] == 0 || (y < 3 && matrixNumber[x, y] == matrixNumber[x, y + 1]) || (x < 3 && matrixNumber[x, y] == matrixNumber[x + 1, y]))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        private void newGameToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            NewGame();
+            frmMain_Paint(null, null);
+        }
+
+        private void closeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Are you sure want to exit game?", "2048", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                Application.Exit();
+        }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var about = new frmAbout();
+            about.ShowDialog();
+        }
+
+        private void userGuideToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string howToPlay = "Arow Up to swipe Up\r\n" +
+                "Arow Down to swipe Down\r\n" +
+                "Arow Left to swipe Left\r\n" +
+                "Arow Right to swipe Right";
+            MessageBox.Show(howToPlay, "How to play");
         }
     }
 }

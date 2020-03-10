@@ -159,27 +159,31 @@ namespace H2D_2048
         {
             try
             {
+                bool bCanMove = false;
                 if (GameOver)
                 {
                     return;
                 }
                 if (e.KeyCode == Keys.Up)
                 {
-                    ActionUp();
+                    bCanMove = ActionUp();
                 }
                 if (e.KeyCode == Keys.Down)
                 {
-                    ActionDown();
+                    bCanMove = ActionDown();
                 }
                 if (e.KeyCode == Keys.Right)
                 {
-                    ActionRight();
+                    bCanMove = ActionRight();
                 }
                 if (e.KeyCode == Keys.Left)
                 {
-                    ActionLeft();
+                    bCanMove = ActionLeft();
                 }
-                RandomBlock();
+                if (bCanMove)
+                {
+                    RandomBlock();
+                }
                 Refresh();
                 if (CheckGameOver())
                 {
@@ -218,8 +222,9 @@ namespace H2D_2048
             File.WriteAllText(fullPath, hiscore.ToString());
         }
 
-        private void ActionRight()
+        private bool ActionRight()
         {
+            bool output = false;
             for (int x = 3; x > 0; x--)
             {
                 for (int y = 0; y < 4; y++)
@@ -232,21 +237,25 @@ namespace H2D_2048
                             {
                                 matrixNumber[x, y] = matrixNumber[x1, y];
                                 matrixNumber[x1, y] = 0;
+                                output = true;
                             }
                             else if (matrixNumber[x, y] == matrixNumber[x1, y])
                             {
                                 matrixNumber[x, y] *= 2;
                                 matrixNumber[x1, y] = 0;
+                                output = true;
                             }
                             break;
                         }
                     }
                 }
             }
+            return output;
         }
 
-        private void ActionLeft()
+        private bool ActionLeft()
         {
+            bool output = false;
             for (int x = 0; x < 3; x++)
             {
                 for (int y = 0; y < 4; y++)
@@ -259,21 +268,25 @@ namespace H2D_2048
                             {
                                 matrixNumber[x, y] = matrixNumber[x1, y];
                                 matrixNumber[x1, y] = 0;
+                                output = true;
                             }
                             else if (matrixNumber[x, y] == matrixNumber[x1, y])
                             {
                                 matrixNumber[x, y] *= 2;
                                 matrixNumber[x1, y] = 0;
+                                output = true;
                             }
                             break;
                         }
                     }
                 }
             }
+            return output;
         }
 
-        private void ActionDown()
+        private bool ActionDown()
         {
+            bool output = false;
             for (int x = 0; x < 4; x++)
             {
                 for (int y = 3; y > 0; y--)
@@ -287,21 +300,25 @@ namespace H2D_2048
                                 matrixNumber[x, y] = matrixNumber[x, y1];
                                 matrixNumber[x, y1] = 0;
                                 y++;
+                                output = true;
                             }
                             else if (matrixNumber[x, y] == matrixNumber[x, y1])
                             {
                                 matrixNumber[x, y] *= 2;
                                 matrixNumber[x, y1] = 0;
+                                output = true;
                             }
                             break;
                         }
                     }
                 }
             }
+            return output;
         }
 
-        private void ActionUp()
+        private bool ActionUp()
         {
+            bool output = false;
             for (int x = 0; x < 4; x++)
             {
                 for (int y = 0; y < 3; y++)
@@ -315,17 +332,20 @@ namespace H2D_2048
                                 matrixNumber[x, y] = matrixNumber[x, y1];
                                 matrixNumber[x, y1] = 0;
                                 y--;
+                                output = true;
                             }
                             else if (matrixNumber[x, y] == matrixNumber[x, y1])
                             {
                                 matrixNumber[x, y] *= 2;
                                 matrixNumber[x, y1] = 0;
+                                output = true;
                             }
                             break;
                         }
                     }
                 }
             }
+            return output;
         }
 
         private bool CheckGameOver()

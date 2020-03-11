@@ -101,6 +101,12 @@ namespace H2D_2048
                             case 2048:
                                 block.SetTo2048(matrixBoard[i, j]);
                                 break;
+                            case 4096:
+                                block.SetTo4096(matrixBoard[i, j]);
+                                break;
+                            case 8192:
+                                block.SetTo8192(matrixBoard[i, j]);
+                                break;
                         }
                     }
                 }

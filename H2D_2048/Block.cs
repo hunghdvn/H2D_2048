@@ -86,5 +86,17 @@ namespace H2D_2048
             label.Text = "2048";
             label.BackColor = Color.FromArgb(255, 128, 255);
         }
+
+        public void SetTo4096(Label label)
+        {
+            label.Text = "4096";
+            label.BackColor = Color.FromArgb(192, 192, 0);
+        }
+
+        public void SetTo8192(Label label)
+        {
+            label.Text = "8192";
+            label.BackColor = Color.GreenYellow;
+        }
     }
 }

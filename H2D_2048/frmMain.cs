@@ -38,6 +38,7 @@ namespace H2D_2048
 
         private void NewGame()
         {
+            GameOver = false;
             LoadHiscore();
             Score = 0;
             lbScore.Text = Score.ToString();
